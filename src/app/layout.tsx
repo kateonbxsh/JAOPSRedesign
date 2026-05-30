@@ -3,9 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import "@fontsource-variable/inter";
-import "@fontsource-variable/space-grotesk";
 import { StarBackground } from "@/components/StarBackground";
-import { navGroups } from "@/content/jaops";
+import { navButtons, navGroups, socialLinks } from "@/content/jaops";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,23 +28,66 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span>{group.title}</span>
                 <div className="nav-menu">
                   {group.items.map((item) => (
-                    <Link href={item.href} key={item.label}>
+                    <span className="nav-menu-item" key={item.label}>
                       {item.label}
-                    </Link>
+                    </span>
                   ))}
                 </div>
               </div>
             ))}
+            {navButtons.map((item) => (
+              <span className="nav-button" key={item}>
+                {item}
+              </span>
+            ))}
           </nav>
 
           <div className="header-actions">
-            <Link className="contact-link" href="/templates/#contact">
+            <Link className="contact-link" href="#contact">
               Contact
               <ArrowUpRight size={16} />
             </Link>
           </div>
         </header>
         {children}
+        <footer className="site-footer" id="contact">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <Image src="/jaops-logo-white.png" alt="JAOPS" width={167} height={40} />
+              <p>Mission operations design, tools, training, and support for aerospace teams.</p>
+              <div className="footer-brand-contact">
+                <a href="mailto:info@jaops.com">info@jaops.com</a>
+                <address>
+                  3-3-13 Nishi-Shinjuku, Shinjuku-ku, Tokyo Nishi-Shinjuku Mizuma Building 6th floor,
+                  Tokyo 160-0023, Japan
+                </address>
+              </div>
+            </div>
+
+            {navGroups.map((group) => (
+              <div className="footer-column" key={group.title}>
+                <h2>{group.title}</h2>
+                {group.items.map((item) => (
+                  <span key={item.label}>{item.label}</span>
+                ))}
+              </div>
+            ))}
+
+            <div className="footer-column">
+              <h2>Connect</h2>
+              {socialLinks.map((link) => (
+                <a href={link.href} key={link.label} rel="noreferrer" target="_blank">
+                  {link.label}
+                </a>
+              ))}
+            </div>
+
+          </div>
+          <div className="footer-bottom">
+            <span>© {new Date().getFullYear()} JAOPS</span>
+            <span>Never fly alone.</span>
+          </div>
+        </footer>
       </body>
     </html>
   );

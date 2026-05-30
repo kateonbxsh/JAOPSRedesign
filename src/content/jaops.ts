@@ -27,6 +27,7 @@ export type ServiceCard = {
   description: string;
   href: string;
   icon: LucideIcon;
+  image?: string;
 };
 
 export const navGroups: NavGroup[] = [
@@ -53,11 +54,34 @@ export const navGroups: NavGroup[] = [
       { label: "About", href: "/templates/#about" },
       { label: "Missions", href: "/templates/#missions" },
       { label: "Partners", href: "/templates/#partners" },
-      { label: "News & Events", href: "/templates/#events" },
       { label: "Contact", href: "/templates/#contact" }
     ]
   }
 ];
+
+export const navButtons = ["Gallery", "News & Events", "Private Demos"];
+
+export const socialLinks = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/jaops" },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61554250181835" },
+  { label: "YouTube", href: "https://www.youtube.com/@jaops-space" }
+];
+
+export const homeAssets = {
+  futureIllustration: "/jaops-assets/home-future-illustration.png",
+  videos: [
+    {
+      title: "Simulation of the Lunar PIONEER rover at the Moon's South Pole",
+      image: "/jaops-assets/home-operations-mcc.png",
+      href: "https://www.youtube.com/watch?v=z7fS4HvoUb8"
+    },
+    {
+      title: "Demo of On-Orbit Services Simulation using NVIDIA Omniverse",
+      image: "/jaops-assets/home-operations-console.png",
+      href: "https://www.youtube.com/watch?v=ziZgHS5BDNg"
+    }
+  ]
+};
 
 export const hero = {
   kicker: "Never fly alone",
@@ -77,7 +101,7 @@ export const homeSections = [
       "Newspace teams need real-time monitoring, reliable mission control facilities, and practical operational knowledge without Oldspace lead times. JAOPS combines MCC development, tools, logistics, training, and operational experience to accelerate flight readiness."
   },
   {
-    title: "Operations, the forgotten discipline",
+    title: "OPS, the forgotten discipline",
     body:
       "Spacecraft operations are often overshadowed by hardware and software development. JAOPS reduces this gap with tools, certification, anomaly resolution, mission planning, data processing, real-time monitoring, and experienced operators."
   },
@@ -93,6 +117,7 @@ export const pillars: ServiceCard[] = [
     title: "Operations",
     href: "/templates/#oaas",
     icon: Satellite,
+    image: "/jaops-assets/home-operations-mcc.png",
     description:
       "Mission control, planning, monitoring, anomaly resolution, data processing, and live support from experienced operators."
   },
@@ -100,6 +125,7 @@ export const pillars: ServiceCard[] = [
     title: "Education",
     href: "/templates/#training",
     icon: GraduationCap,
+    image: "/jaops-assets/home-education-session.jpeg",
     description:
       "Certification, real-life operations training, team coaching, STEM engagement, and mission-specific readiness programs."
   },
@@ -107,6 +133,7 @@ export const pillars: ServiceCard[] = [
     title: "Tools",
     href: "/templates/#tools",
     icon: MonitorCog,
+    image: "/jaops-assets/home-tools-circuit.jpeg",
     description:
       "Yamcs Gateway, mission control systems, planning tools, knowledge management, data analysis, alarms, shift planning, and VoIP."
   }
@@ -196,13 +223,18 @@ export const missionExperience = [
   "Synspective Strix missions"
 ];
 
-export const partners = [
-  "Moon Village Association",
-  "Meridian Space Command",
-  "Asteria ART",
-  "3IPK",
-  "Space Robotics Lab",
-  "Dymon"
+export type PartnerLogo = {
+  name: string;
+  logo: string;
+};
+
+export const partners: PartnerLogo[] = [
+  { name: "Moon Village Association", logo: "/jaops-assets/partner-moon-village.png" },
+  { name: "Meridian Space Command", logo: "/jaops-assets/partner-meridian.png" },
+  { name: "Asteria ART", logo: "/jaops-assets/partner-asteria-art.png" },
+  { name: "3IPK", logo: "/jaops-assets/partner-3ipk.png" },
+  { name: "Space Robotics Lab", logo: "/jaops-assets/partner-space-robotics-lab.png" },
+  { name: "Dymon", logo: "/jaops-assets/partner-dymon.png" }
 ];
 
 export const templateSections = [

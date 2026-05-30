@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check, ExternalLink, Mail, MapPin } from "lucide-react";
+import { CapabilityGridSection, MetricBand, ProofListSection } from "@/components/PageSections";
 import { Reveal } from "@/components/Reveal";
 import {
   metrics,
@@ -78,49 +79,17 @@ export default function TemplatesPage() {
         </div>
       </section>
 
-      <section className="proof-section template-proof" id="oaas">
-        <Reveal className="proof-copy">
-          <span className="eyebrow">Metric template</span>
-          <h2>Operations as a Service proof band</h2>
-          <p>
-            This pattern supports quantified claims with a concise left-side narrative and compact stat cards on the
-            right.
-          </p>
-        </Reveal>
-        <div className="metric-grid">
-          {metrics.map((metric, index) => (
-            <Reveal delay={index * 0.05} key={metric.label}>
-              <div className="metric-card">
-                <strong>{metric.value}</strong>
-                <span>{metric.label}</span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
+      <MetricBand
+        id="oaas"
+        className="template-proof"
+        eyebrow="Metric template"
+        title="Operations as a Service proof band"
+        body="This pattern supports quantified claims with a concise left-side narrative and compact stat cards on the right."
+        checks={["Cost indicators", "Readiness milestones", "Operational constraints", "Mission support scope"]}
+        metrics={metrics}
+      />
 
-      <section className="section" id="services">
-        <Reveal className="section-heading">
-          <span className="eyebrow">Card grid template</span>
-          <h2>Services and products</h2>
-        </Reveal>
-        <div className="card-grid">
-          {[...services, ...products].map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <Reveal delay={index * 0.04} key={item.title}>
-                <article className="feature-card" id={item.href.split("#")[1]}>
-                  <span className="card-icon">
-                    <Icon size={22} />
-                  </span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </article>
-              </Reveal>
-            );
-          })}
-        </div>
-      </section>
+      <CapabilityGridSection id="services" eyebrow="Card grid template" title="Services and products" items={[...services, ...products]} />
 
       <section className="process-section" id="turnkey-mcc">
         <Reveal className="section-heading">
@@ -142,30 +111,16 @@ export default function TemplatesPage() {
         </div>
       </section>
 
-      <section className="heritage-section" id="missions">
-        <Reveal>
-          <span className="eyebrow">List template</span>
-          <h2>Mission and partner proof</h2>
-          <p>
-            Compact text lists keep dense source-site material scannable while preserving the full mission heritage for
-            later detail pages.
-          </p>
-        </Reveal>
-        <div className="heritage-lists">
-          <div id="partners">
-            <h3>Partners</h3>
-            {partners.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
-          <div>
-            <h3>Mission heritage</h3>
-            {missionExperience.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ProofListSection
+        id="missions"
+        eyebrow="List template"
+        title="Mission and partner proof"
+        body="Compact text lists keep dense source-site material scannable while preserving the full mission heritage for later detail pages."
+        lists={[
+          { title: "Partners", items: partners.map((partner) => partner.name) },
+          { title: "Mission heritage", items: missionExperience }
+        ]}
+      />
 
       <Reveal className="contact-template" id="contact">
         <div>
