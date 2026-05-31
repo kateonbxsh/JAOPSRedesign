@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JAOPS Logo Animation</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --logo-width: min(82vw, 1420px);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+      }
+
+      .stage {
+        position: relative;
+        width: var(--logo-width);
+        aspect-ratio: 944 / 229;
+      }
+
+      svg,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      canvas {
+        pointer-events: none;
+      }
+
+      .controls {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 10px;
+        background: rgba(12, 12, 14, 0.76);
+        backdrop-filter: blur(16px);
+      }
+
+      .controls button {
+        min-height: 38px;
+        padding: 0 14px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 7px;
+        background: rgba(225, 27, 34, 0.84);
+        color: #fff;
+        cursor: pointer;
+        font: 600 13px Arial, sans-serif;
+      }
+
+      .controls button:disabled {
+        cursor: wait;
+        opacity: 0.56;
+      }
+
+      .export-status {
+        min-width: 94px;
+        color: rgba(255, 255, 255, 0.72);
+        font: 12px Arial, sans-serif;
+      }
+
+      .logo-fill {
+        opacity: 0;
+        transition: opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .logo-fill.visible {
+        opacity: 1;
+      }
+
+    </style>
+  </head>
+  <body>
+    <main class="stage" aria-label="Animated JAOPS logo">
+      <svg id="logo" viewBox="0 0 944 229" role="img" aria-label="JAOPS">
+        <g class="logo-fill" id="logo-fill">
+          <path
+            fill="#fff"
+            d="M796 20h148v36H804l-5 1q-3 4-2 10v3q0 3 2 6 7 3 14 2h69q25-3 44 13c15 15 18 36 18 56q0 31-21 53c-12 9-24 9-38 9H761v-35h12l108-1h4q11 1 19-5 11-17 6-38-1-9-8-15-7-3-15-2h-89q-15-1-25-11a62 62 0 0 1-14-45q2-17 13-29 11-8 24-8M577 20h110q24 0 41 16 23 27 20 61-1 37-26 63-13 11-30 12h-9l-10 1h-62v36h-33zm34 36v82h60c13 0 24 0 34-9q15-16 13-38-1-17-13-28-10-8-24-7h-70M301 20v189l-34-1v-44l-32-3h-3c-24-1-24-1-45 10q-9 8-16 18c-16 20-16 20-28 21q-15 0-28-3l7-9 1-2 5-4L251 68l1-1 42-42 1-2zm-37 81-24 23-1 1q-4 2-4 5h31l1-31z"
+          />
+          <path
+            fill="#e11b22"
+            d="m503 19 6 6q-6 1-10-2-30-11-61-3l-2 1q-38 13-57 48-10 21-10 45v4a78 78 0 0 0 4 26 99 99 0 0 0 59 63l2 1c22 8 48 6 70-4l5-1q-2 5-8 8l-2 1a115 115 0 0 1-93 13l-2-1c-28-8-51-29-64-54q-23-44-9-92 17-46 60-68c36-17 79-13 112 9"
+          />
+          <path
+            fill="#fff"
+            d="M97 20h34v106c1 48 1 48-17 66-15 15-36 17-56 17h-7a65 65 0 0 1-51-19l4-8 2-2 2-3 4-4 2-2 3-5 8 5q21 12 44 6 13-2 20-12a47 47 0 0 0 7-28v-28z"
+          />
+          <path
+            fill="#e11b22"
+            d="m511 48 7 6 3 2q23 24 24 56 0 36-25 61a77 77 0 0 1-56 21c-16 0-34-5-46-16v-2l14 4q24 7 46-5 26-14 34-41 7-30-8-57a68 68 0 0 0-42-29q-21-4-41 5h-3q5-8 14-11c26-12 55-10 79 6"
+          />
+        </g>
+      </svg>
+      <canvas id="tracers"></canvas>
+    </main>
+    <div class="controls">
+      <button id="export-gif" type="button">Export GIF</button>
+      <span class="export-status" id="export-status">Ready</span>
+    </div>
+
+    <script type="module">
+      import { GIFEncoder, applyPalette, quantize } from "https://unpkg.com/gifenc@1.0.3";
+
+      const CONFIG = {
+        startDelayMs: 500,
+        drawDurationMs: 4600,
+        fillDelayMs: 240,
+        fillDurationMs: 1200,
+        loopPauseMs: 2200,
+        lineWidth: 1,
+        starRadius: 2.8,
+        starGlow: 26,
+        exportWidth: 944,
+        exportHeight: 229,
+        exportFps: 20,
+        exportEndHoldMs: 1000
+      };
+
+      const logo = document.querySelector("#logo");
+      const fill = document.querySelector("#logo-fill");
+      const canvas = document.querySelector("#tracers");
+      const context = canvas.getContext("2d");
+      const exportButton = document.querySelector("#export-gif");
+      const exportStatus = document.querySelector("#export-status");
+      const shouldLoop = new URLSearchParams(window.location.search).get("loop") === "1";
+      const FORM_DATA = [
+        {
+          color: "#fff",
+          path: "M796 20h148v36H804l-5 1q-3 4-2 10v3q0 3 2 6 7 3 14 2h69q25-3 44 13c15 15 18 36 18 56q0 31-21 53c-12 9-24 9-38 9H761v-35h12l108-1h4q11 1 19-5 11-17 6-38-1-9-8-15-7-3-15-2h-89q-15-1-25-11a62 62 0 0 1-14-45q2-17 13-29 11-8 24-8"
+        },
+        {
+          color: "#fff",
+          path: "M577 20h110q24 0 41 16 23 27 20 61-1 37-26 63-13 11-30 12h-9l-10 1h-62v36h-33z"
+        },
+        {
+          color: "#fff",
+          path: "M611 56v82h60c13 0 24 0 34-9q15-16 13-38-1-17-13-28-10-8-24-7h-70"
+        },
+        {
+          color: "#fff",
+          path: "M301 20v189l-34-1v-44l-32-3h-3c-24-1-24-1-45 10q-9 8-16 18c-16 20-16 20-28 21q-15 0-28-3l7-9 1-2 5-4L251 68l1-1 42-42 1-2z"
+        },
+        {
+          color: "#fff",
+          path: "M264 101l-24 23-1 1q-4 2-4 5h31l1-31z"
+        },
+        {
+          color: "#e11b22",
+          path: "m503 19 6 6q-6 1-10-2-30-11-61-3l-2 1q-38 13-57 48-10 21-10 45v4a78 78 0 0 0 4 26 99 99 0 0 0 59 63l2 1c22 8 48 6 70-4l5-1q-2 5-8 8l-2 1a115 115 0 0 1-93 13l-2-1c-28-8-51-29-64-54q-23-44-9-92 17-46 60-68c36-17 79-13 112 9"
+        },
+        {
+          color: "#fff",
+          path: "M97 20h34v106c1 48 1 48-17 66-15 15-36 17-56 17h-7a65 65 0 0 1-51-19l4-8 2-2 2-3 4-4 2-2 3-5 8 5q21 12 44 6 13-2 20-12a47 47 0 0 0 7-28v-28z"
+        },
+        {
+          color: "#e11b22",
+          path: "m511 48 7 6 3 2q23 24 24 56 0 36-25 61a77 77 0 0 1-56 21c-16 0-34-5-46-16v-2l14 4q24 7 46-5 26-14 34-41 7-30-8-57a68 68 0 0 0-42-29q-21-4-41 5h-3q5-8 14-11c26-12 55-10 79 6"
+        }
+      ];
+      let animationFrame;
+      let startedAt;
+      let forms = [];
+      let fillForms = [];
+
+      function buildForms() {
+        forms = FORM_DATA.map((form) => {
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", form.path);
+          return { ...form, element: path, length: path.getTotalLength() };
+        });
+        fillForms = [...fill.querySelectorAll("path")].map((path) => ({
+          color: path.getAttribute("fill"),
+          path: new Path2D(path.getAttribute("d"))
+        }));
+      }
+
+      function resizeCanvas() {
+        const bounds = canvas.getBoundingClientRect();
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(bounds.width * ratio);
+        canvas.height = Math.round(bounds.height * ratio);
+      }
+
+      function clearCanvas() {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      }
+
+      function svgToCanvas(point) {
+        const bounds = canvas.getBoundingClientRect();
+        return {
+          x: (point.x / logo.viewBox.baseVal.width) * bounds.width,
+          y: (point.y / logo.viewBox.baseVal.height) * bounds.height
+        };
+      }
+
+      function drawForm(form, progress, showTracer) {
+        const steps = Math.max(2, Math.ceil(180 * progress));
+        let point;
+
+        context.save();
+        context.strokeStyle = form.color;
+        context.lineWidth = CONFIG.lineWidth;
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.globalAlpha = 0.78;
+        context.beginPath();
+
+        for (let index = 0; index <= steps; index += 1) {
+          point = svgToCanvas(form.element.getPointAtLength(form.length * progress * (index / steps)));
+          if (index === 0) context.moveTo(point.x, point.y);
+          else context.lineTo(point.x, point.y);
+        }
+
+        context.stroke();
+
+        if (showTracer) {
+          context.globalAlpha = 0.42;
+          context.fillStyle = form.color;
+          context.shadowColor = form.color;
+          context.shadowBlur = CONFIG.starGlow * 1.5;
+          context.beginPath();
+          context.arc(point.x, point.y, CONFIG.starRadius * 2.1, 0, Math.PI * 2);
+          context.fill();
+
+          context.globalAlpha = 1;
+          context.fillStyle = "#fff";
+          context.shadowColor = form.color;
+          context.shadowBlur = CONFIG.starGlow;
+          context.beginPath();
+          context.arc(point.x, point.y, CONFIG.starRadius, 0, Math.PI * 2);
+          context.fill();
+        }
+
+        context.restore();
+      }
+
+      function drawExportForm(exportContext, form, progress, showTracer) {
+        const steps = Math.max(2, Math.ceil(180 * progress));
+        let point;
+
+        exportContext.save();
+        exportContext.strokeStyle = form.color;
+        exportContext.lineWidth = CONFIG.lineWidth;
+        exportContext.lineCap = "round";
+        exportContext.lineJoin = "round";
+        exportContext.globalAlpha = 0.78;
+        exportContext.beginPath();
+
+        for (let index = 0; index <= steps; index += 1) {
+          point = form.element.getPointAtLength(form.length * progress * (index / steps));
+          if (index === 0) exportContext.moveTo(point.x, point.y);
+          else exportContext.lineTo(point.x, point.y);
+        }
+
+        exportContext.stroke();
+
+        if (showTracer) {
+          exportContext.globalAlpha = 0.42;
+          exportContext.fillStyle = form.color;
+          exportContext.shadowColor = form.color;
+          exportContext.shadowBlur = CONFIG.starGlow * 1.5;
+          exportContext.beginPath();
+          exportContext.arc(point.x, point.y, CONFIG.starRadius * 2.1, 0, Math.PI * 2);
+          exportContext.fill();
+
+          exportContext.globalAlpha = 1;
+          exportContext.fillStyle = "#fff";
+          exportContext.shadowColor = form.color;
+          exportContext.shadowBlur = CONFIG.starGlow;
+          exportContext.beginPath();
+          exportContext.arc(point.x, point.y, CONFIG.starRadius, 0, Math.PI * 2);
+          exportContext.fill();
+        }
+
+        exportContext.restore();
+      }
+
+      function drawExportFrame(exportContext, elapsed) {
+        const progress = Math.max(0, Math.min(1, (elapsed - CONFIG.startDelayMs) / CONFIG.drawDurationMs));
+        const fillProgress = Math.max(
+          0,
+          Math.min(1, (elapsed - CONFIG.startDelayMs - CONFIG.drawDurationMs - CONFIG.fillDelayMs) / CONFIG.fillDurationMs)
+        );
+
+        exportContext.setTransform(1, 0, 0, 1, 0, 0);
+        exportContext.fillStyle = "#000";
+        exportContext.fillRect(0, 0, CONFIG.exportWidth, CONFIG.exportHeight);
+        exportContext.save();
+        exportContext.scale(CONFIG.exportWidth / 944, CONFIG.exportHeight / 229);
+
+        for (const form of forms) {
+          if (progress > 0) drawExportForm(exportContext, form, progress, progress < 1);
+        }
+
+        if (fillProgress > 0) {
+          exportContext.globalAlpha = fillProgress;
+          for (const form of fillForms) {
+            exportContext.fillStyle = form.color;
+            exportContext.fill(form.path);
+          }
+        }
+
+        exportContext.restore();
+      }
+
+      async function exportGif() {
+        exportButton.disabled = true;
+        exportStatus.textContent = "Preparing...";
+
+        try {
+          const exportCanvas = document.createElement("canvas");
+          const exportContext = exportCanvas.getContext("2d");
+          exportCanvas.width = CONFIG.exportWidth;
+          exportCanvas.height = CONFIG.exportHeight;
+
+          const frameDelay = Math.round(1000 / CONFIG.exportFps);
+          const duration =
+            CONFIG.startDelayMs +
+            CONFIG.drawDurationMs +
+            CONFIG.fillDelayMs +
+            CONFIG.fillDurationMs +
+            CONFIG.exportEndHoldMs;
+          const frameCount = Math.ceil(duration / frameDelay);
+          const gif = GIFEncoder();
+
+          for (let index = 0; index < frameCount; index += 1) {
+            drawExportFrame(exportContext, index * frameDelay);
+            const image = exportContext.getImageData(0, 0, CONFIG.exportWidth, CONFIG.exportHeight);
+            const palette = quantize(image.data, 256, { format: "rgb444" });
+            const indexed = applyPalette(image.data, palette, "rgb444");
+            gif.writeFrame(indexed, CONFIG.exportWidth, CONFIG.exportHeight, {
+              delay: frameDelay,
+              palette,
+              repeat: 0
+            });
+            exportStatus.textContent = `Encoding ${index + 1}/${frameCount}`;
+            if (index % 8 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+
+          gif.finish();
+          const blob = new Blob([gif.bytes()], { type: "image/gif" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "jaops-logo-animation.gif";
+          link.click();
+          URL.revokeObjectURL(url);
+          exportStatus.textContent = "Downloaded";
+        } catch (error) {
+          console.error(error);
+          exportStatus.textContent = "Export failed";
+        } finally {
+          exportButton.disabled = false;
+        }
+      }
+
+      function render(now) {
+        clearCanvas();
+        const elapsed = now - startedAt - CONFIG.startDelayMs;
+        const progress = Math.max(0, Math.min(1, elapsed / CONFIG.drawDurationMs));
+
+        for (const form of forms) {
+          if (progress > 0) drawForm(form, progress, progress < 1);
+        }
+
+        if (elapsed >= CONFIG.drawDurationMs + CONFIG.fillDelayMs) {
+          fill.classList.add("visible");
+        }
+
+        const cycleDuration =
+          CONFIG.startDelayMs +
+          CONFIG.drawDurationMs +
+          CONFIG.fillDelayMs +
+          CONFIG.fillDurationMs +
+          CONFIG.loopPauseMs;
+
+        if (shouldLoop && now - startedAt >= cycleDuration) {
+          restart();
+          return;
+        }
+
+        animationFrame = requestAnimationFrame(render);
+      }
+
+      function restart() {
+        cancelAnimationFrame(animationFrame);
+        clearCanvas();
+        fill.classList.remove("visible");
+        buildForms();
+        startedAt = performance.now();
+        animationFrame = requestAnimationFrame(render);
+      }
+
+      window.addEventListener("resize", resizeCanvas);
+      window.addEventListener("click", (event) => {
+        if (!event.target.closest(".controls")) restart();
+      });
+      window.addEventListener("keydown", (event) => {
+        if (event.target.closest(".controls")) return;
+        if (event.code === "Space" || event.code === "Enter") restart();
+      });
+      exportButton.addEventListener("click", exportGif);
+
+      resizeCanvas();
+      restart();
+    </script>
+  </body>
+</html>

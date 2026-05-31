@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { assetPath } from "@/lib/assets";
 import {
   Activity,
   BadgeCheck,
@@ -68,16 +69,16 @@ export const socialLinks = [
 ];
 
 export const homeAssets = {
-  futureIllustration: "/jaops-assets/home-future-illustration.png",
+  futureIllustration: assetPath("/jaops-assets/home-future-illustration.png"),
   videos: [
     {
       title: "Simulation of the Lunar PIONEER rover at the Moon's South Pole",
-      image: "/jaops-assets/home-operations-mcc.png",
+      image: assetPath("/jaops-assets/home-operations-mcc.png"),
       href: "https://www.youtube.com/watch?v=z7fS4HvoUb8"
     },
     {
       title: "Demo of On-Orbit Services Simulation using NVIDIA Omniverse",
-      image: "/jaops-assets/home-operations-console.png",
+      image: assetPath("/jaops-assets/home-operations-console.png"),
       href: "https://www.youtube.com/watch?v=ziZgHS5BDNg"
     }
   ]
@@ -117,7 +118,7 @@ export const pillars: ServiceCard[] = [
     title: "Operations",
     href: "/templates/#oaas",
     icon: Satellite,
-    image: "/jaops-assets/home-operations-mcc.png",
+    image: assetPath("/jaops-assets/home-operations-mcc.png"),
     description:
       "Mission control, planning, monitoring, anomaly resolution, data processing, and live support from experienced operators."
   },
@@ -125,7 +126,7 @@ export const pillars: ServiceCard[] = [
     title: "Education",
     href: "/templates/#training",
     icon: GraduationCap,
-    image: "/jaops-assets/home-education-session.jpeg",
+    image: assetPath("/jaops-assets/home-education-session.jpeg"),
     description:
       "Certification, real-life operations training, team coaching, STEM engagement, and mission-specific readiness programs."
   },
@@ -133,7 +134,7 @@ export const pillars: ServiceCard[] = [
     title: "Tools",
     href: "/templates/#tools",
     icon: MonitorCog,
-    image: "/jaops-assets/home-tools-circuit.jpeg",
+    image: assetPath("/jaops-assets/home-tools-circuit.jpeg"),
     description:
       "Yamcs Gateway, mission control systems, planning tools, knowledge management, data analysis, alarms, shift planning, and VoIP."
   }
@@ -229,12 +230,12 @@ export type PartnerLogo = {
 };
 
 export const partners: PartnerLogo[] = [
-  { name: "Moon Village Association", logo: "/jaops-assets/partner-moon-village.png" },
-  { name: "Meridian Space Command", logo: "/jaops-assets/partner-meridian.png" },
-  { name: "Asteria ART", logo: "/jaops-assets/partner-asteria-art.png" },
-  { name: "3IPK", logo: "/jaops-assets/partner-3ipk.png" },
-  { name: "Space Robotics Lab", logo: "/jaops-assets/partner-space-robotics-lab.png" },
-  { name: "Dymon", logo: "/jaops-assets/partner-dymon.png" }
+  { name: "Moon Village Association", logo: assetPath("/jaops-assets/partner-moon-village.png") },
+  { name: "Meridian Space Command", logo: assetPath("/jaops-assets/partner-meridian.png") },
+  { name: "Asteria ART", logo: assetPath("/jaops-assets/partner-asteria-art.png") },
+  { name: "3IPK", logo: assetPath("/jaops-assets/partner-3ipk.png") },
+  { name: "Space Robotics Lab", logo: assetPath("/jaops-assets/partner-space-robotics-lab.png") },
+  { name: "Dymon", logo: assetPath("/jaops-assets/partner-dymon.png") }
 ];
 
 export const templateSections = [

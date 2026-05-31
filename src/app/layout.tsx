@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Globe2 } from "lucide-react";
 import "@fontsource-variable/inter";
+import { MobileMenu } from "@/components/MobileMenu";
 import { StarBackground } from "@/components/StarBackground";
 import { navButtons, navGroups, socialLinks } from "@/content/jaops";
+import { assetPath } from "@/lib/assets";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,27 +21,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StarBackground />
         <header className="site-header">
           <Link href="/" className="brand" aria-label="JAOPS home">
-            <Image src="/jaops-logo-white.png" alt="JAOPS" width={167} height={40} priority />
+            <Image src={assetPath("/jaops-logo-white.png")} alt="JAOPS" width={167} height={40} priority />
           </Link>
 
           <nav className="desktop-nav" aria-label="Primary navigation">
             {navGroups.map((group) => (
               <div className="nav-group" key={group.title}>
-                <span>{group.title}</span>
+                <button type="button">{group.title}</button>
                 <div className="nav-menu">
                   {group.items.map((item) => (
-                    <span className="nav-menu-item" key={item.label}>
+                    <button className="nav-menu-item" type="button" key={item.label}>
                       {item.label}
-                    </span>
+                    </button>
                   ))}
                 </div>
               </div>
             ))}
             {navButtons.map((item) => (
-              <span className="nav-button" key={item}>
+              <button className="nav-button" type="button" key={item}>
                 {item}
-              </span>
+              </button>
             ))}
+            <details className="nav-language">
+              <summary className="nav-button">
+              <Globe2 size={15} />
+              English
+              </summary>
+              <div className="nav-language-menu">
+                <button type="button">English</button>
+                <button type="button">Japanese</button>
+                <button type="button">French</button>
+              </div>
+            </details>
           </nav>
 
           <div className="header-actions">
@@ -48,12 +61,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <ArrowUpRight size={16} />
             </Link>
           </div>
+          <MobileMenu />
         </header>
         {children}
         <footer className="site-footer" id="contact">
           <div className="footer-grid">
             <div className="footer-brand">
-              <Image src="/jaops-logo-white.png" alt="JAOPS" width={167} height={40} />
+              <Image src={assetPath("/jaops-logo-white.png")} alt="JAOPS" width={167} height={40} />
               <p>Mission operations design, tools, training, and support for aerospace teams.</p>
               <div className="footer-brand-contact">
                 <a href="mailto:info@jaops.com">info@jaops.com</a>
@@ -84,7 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           </div>
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} JAOPS</span>
+            <span>&copy; {new Date().getFullYear()} JAOPS</span>
             <span>Never fly alone.</span>
           </div>
         </footer>

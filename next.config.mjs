@@ -11,7 +11,10 @@ const nextConfig = {
   },
   trailingSlash: true,
   basePath: githubPagesBasePath,
-  assetPrefix: githubPagesBasePath ? `${githubPagesBasePath}/` : ""
+  assetPrefix: githubPagesBasePath ? `${githubPagesBasePath}/` : "",
+  env: {
+    NEXT_PUBLIC_BASE_PATH: githubPagesBasePath
+  }
 };
 
 export default nextConfig;

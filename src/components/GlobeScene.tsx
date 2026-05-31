@@ -3,7 +3,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import ThreeGlobe from "three-globe";
 import globeDots from "@/content/globe-dots.json";
 
 const SCENE_CONTROLS = {
@@ -79,6 +78,33 @@ const SATELLITES = [
     inclination: 64,
     ascendingNode: -34,
     trailGap: 0.042 * SCENE_CONTROLS.satelliteTrailSpacing
+  },
+  {
+    phase: 1.45,
+    speed: 0.31 * SCENE_CONTROLS.satelliteSpeedMultiplier,
+    color: "#d41422",
+    altitude: 0.05,
+    inclination: 12,
+    ascendingNode: 88,
+    trailGap: 0.048 * SCENE_CONTROLS.satelliteTrailSpacing
+  },
+  {
+    phase: 3.55,
+    speed: 0.36 * SCENE_CONTROLS.satelliteSpeedMultiplier,
+    color: "#ffffff",
+    altitude: 0.09,
+    inclination: -68,
+    ascendingNode: 12,
+    trailGap: 0.044 * SCENE_CONTROLS.satelliteTrailSpacing
+  },
+  {
+    phase: 5.2,
+    speed: 0.29 * SCENE_CONTROLS.satelliteSpeedMultiplier,
+    color: "#d41422",
+    altitude: 0.07,
+    inclination: 46,
+    ascendingNode: 126,
+    trailGap: 0.05 * SCENE_CONTROLS.satelliteTrailSpacing
   }
 ];
 
@@ -93,17 +119,21 @@ function makeOrbitGeoPoint(t: number, inclination: number, ascendingNode: number
 }
 
 function globeCoordToScenePoint(
-  globe: ThreeGlobe,
   t: number,
   altitude: number,
   inclination: number,
   ascendingNode: number
 ) {
   const { lat, lng } = makeOrbitGeoPoint(t, inclination, ascendingNode);
-  const coords = globe.getCoords(lat, lng, altitude);
-  const scale = globeDots.radius / globe.getGlobeRadius();
+  const radius = globeDots.radius * (1 + altitude);
+  const latRad = THREE.MathUtils.degToRad(lat);
+  const lngRad = THREE.MathUtils.degToRad(lng);
 
-  return new THREE.Vector3(coords.x * scale, coords.y * scale, coords.z * scale);
+  return new THREE.Vector3(
+    -radius * Math.cos(latRad) * Math.sin(lngRad),
+    radius * Math.sin(latRad),
+    radius * Math.cos(latRad) * Math.cos(lngRad)
+  );
 }
 
 function Satellite({
@@ -126,22 +156,17 @@ function Satellite({
   const satelliteRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   const trailGeometryRefs = useRef<Array<THREE.BufferGeometry | null>>([]);
-  const globeHelper = useMemo(() => {
-    const helper = new ThreeGlobe({ animateIn: false, waitForGlobeReady: false });
-    helper.pauseAnimation();
-    return helper;
-  }, []);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime * speed + phase;
-    const currentPoint = globeCoordToScenePoint(globeHelper, t, altitude, inclination, ascendingNode);
+    const currentPoint = globeCoordToScenePoint(t, altitude, inclination, ascendingNode);
     satelliteRef.current?.position.copy(currentPoint);
     glowRef.current?.position.copy(currentPoint);
 
     trailGeometryRefs.current.forEach((geometry, index) => {
       if (!geometry) return;
-      const start = globeCoordToScenePoint(globeHelper, t - index * trailGap, altitude, inclination, ascendingNode);
-      const end = globeCoordToScenePoint(globeHelper, t - (index + 1) * trailGap, altitude, inclination, ascendingNode);
+      const start = globeCoordToScenePoint(t - index * trailGap, altitude, inclination, ascendingNode);
+      const end = globeCoordToScenePoint(t - (index + 1) * trailGap, altitude, inclination, ascendingNode);
       const position = geometry.attributes.position;
       position.setXYZ(0, start.x, start.y, start.z);
       position.setXYZ(1, end.x, end.y, end.z);

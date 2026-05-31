@@ -41,7 +41,7 @@ export default function Home() {
     <main>
       <section className="hero-section">
         <Reveal className="hero-copy">
-          <h1>NEVER FLY ALONE</h1>
+          <h1>Never Fly Alone</h1>
           <p className="hero-title">One-stop Shop for Mission Operations Design, Tools, Training and Support for Mission Success</p>
           <div className="hero-actions">
             <Link className="reflective-button" href="#products-services">
